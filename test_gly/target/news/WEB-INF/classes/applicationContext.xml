@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.springframework.org/schema/beans" 
+	xmlns:context="http://www.springframework.org/schema/context" 
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.2.xsd 
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+	http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.2.xsd ">
+ 	<!-- 1.配置数据库连接  -->
+ 	<context:property-placeholder location="classpath:db.properties"/> 
+ 	<!-- 2.配置数据源 -->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="${jdbc.driverClass}" />
+		<property name="url" value="${jdbc.url}" />
+		<property name="username" value="${jdbc.username}" />
+		<property name="password" value="${jdbc.password}" />
+	</bean> 
+	<!-- 3.产生sqlSessionFactory -->
+	 <bean id="sqlSessionFactoryBean" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+	<!-- 4.引入核心配置文件 -->
+		<property name="configLocation" value="classpath:sqlMapConfig.xml"/>
+	</bean>
+	<!-- 4.Mapper动态代理开发   扫描 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.zh.news.mapper"/>
+	</bean>
+	<!-- 5.配置事务管理器，封装了事务的所有操作，依赖于连接池 -->
+	 <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean> 
+	
+	<!-- 6.配置事务通知  依赖核心事务管理器-->
+	 <tx:advice id="txadvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			 <!-- 方法以save开头			隔离级别可重复读					事务传播行为 					有事务不是只读 -->
+			<tx:method name="save*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false"/>
+			<tx:method name="edit*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false"/>
+			<tx:method name="update*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+			<tx:method name="modify*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+			<tx:method name="delete*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+			<tx:method name="remove*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+			<tx:method name="get*" 		isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+			<tx:method name="find*" 	isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="true" />
+			<tx:method name="add*" 	    isolation="REPEATABLE_READ" propagation="REQUIRED" read-only="false" />
+		</tx:attributes>
+	</tx:advice>
+	
+	<!-- 7.配置织入 -->
+	
+	 <aop:config>
+		<!-- 7.配置切入点表达式 -->
+		<aop:pointcut expression="execution(* com..*ServiceImpl.*(..))" id="point1"/>
+		<!-- 8.配置切面 -->
+		<aop:advisor advice-ref="txadvice" pointcut-ref="point1"/>
+	</aop:config>
+</beans>
