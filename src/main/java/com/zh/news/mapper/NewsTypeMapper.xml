@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zh.news.mapper.NewsTypeMapper">
+    <!-- ***************************** -->
+    <insert id="save" parameterType="elder">
+        INSERT INTO t_elder
+        ( elderName, elderGender, elderAge, elderHealthy, elderHouseholdRegister, elderIdCard, elderLinkman, elderLinkphone, elderAddress, elderBedId, elderCheckinDate, elderLeaveDate )
+        VALUES
+        (#{elderName},#{elderGender},#{elderAge},#{elderHealthy},#{elderHouseholdRegister},#{elderIdCard},#{elderLinkman},#{elderLinkphone},#{elderAddress},#{elderBedId},#{elderCheckinDate},#{elderLeaveDate})
+    </insert>
+
+    <select id="findElderByIdCard" resultType="elder" parameterType="string">
+        SELECT * FROM `t_elder` where elderIdCard=#{elderIdCard}
+    </select>
+
+    <update id="edit" parameterType="elder">
+        update t_elder set elderName=#{elderName}, elderGender=#{elderGender},
+        elderAge=#{elderAge}, elderHealthy=#{elderHealthy}, elderHouseholdRegister=#{elderHouseholdRegister},
+        elderIdCard=#{elderIdCard}, elderLinkman=#{elderLinkman}, elderLinkphone=#{elderLinkphone},
+        elderAddress=#{elderAddress}, elderBedId=#{elderBedId}, elderCheckinDate=#{elderCheckinDate},
+        elderLeaveDate=#{elderLeaveDate}
+        where elderIdCard=#{elderIdCard}
+    </update>
+
+    <select id="findAll" resultType="elder">
+        select * from t_elder order by elderId desc
+    </select>
+
+    <select id="findNewsTypeById" resultType="elder" parameterType="string">
+        select * from t_elder where elderIdCard=#{elderIdCard}
+    </select>
+
+    <delete id="delete" parameterType="string">
+        delete from t_elder where elderIdCard=#{elderIdCard}
+    </delete>
+</mapper>
